@@ -37,6 +37,7 @@ RUN cd /usr/src/nginx && sudo git clone https://github.com/arut/nginx-rtmp-modul
 RUN cd /nginx-* && perl -p -i -e "s/ngx_http_substitutions_filter_module \\\/ngx_http_substitutions_filter_module \\\\\n            --add-module=\/usr\/src\/nginx\/nginx-rtmp-module \\\/g" debian/rules
 RUN cd /nginx-* && dpkg-buildpackage -b
 RUN dpkg --install /nginx-common_* /nginx-full_*
+RUN rm -rf /nginx-*
 
 RUN mkdir -p /usr/local/bin
 ADD ./bin /usr/local/bin
