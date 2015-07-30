@@ -78,7 +78,7 @@ fi
 if [ ! -e ${HTTP_DOCUMENTROOT}/index.php ]; then
    echo "=> Installing wordpress in ${HTTP_DOCUMENTROOT} - this may take a while ..."
    touch ${HTTP_DOCUMENTROOT}/index.php
-   curl -o /tmp/wordpress.tar.gz "https://wordpress.org/wordpress-${WORDPRESS_VERSION}.tar.gz"
+   curl -o /tmp/wordpress.tar.gz ${WORDPRESS_URL}
    tar -zxf /tmp/wordpress.tar.gz -C /tmp/
    mv /tmp/wordpress/* ${HTTP_DOCUMENTROOT}/
    chown -R www-data:www-data ${HTTP_DOCUMENTROOT}

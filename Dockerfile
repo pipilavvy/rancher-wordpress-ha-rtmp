@@ -9,8 +9,13 @@ RUN apt-get update && \
 RUN add-apt-repository -y ppa:gluster/glusterfs-3.5 && \
     apt-get update && \
     apt-get install -y nginx php5-fpm php5-mysql php-apc supervisor glusterfs-client curl haproxy pwgen unzip mysql-client dnsutils
+RUN add-apt-repository -y ppa:mc3man/trusty-media && \
+    apt-get update && \
+    apt-get install -y ffmpeg dpkg-dev git && \
+    apt-get source nginx && \
+    apt-get -y build-dep nginx
 
-ENV WORDPRESS_VERSION 4.2.2
+ENV WORDPRESS_URL https://wordpress.org/wordpress-4.2.2.tar.gz
 ENV WORDPRESS_NAME wordpress
 ENV GLUSTER_VOL ranchervol
 ENV GLUSTER_VOL_PATH /var/www
@@ -25,8 +30,13 @@ ENV DB_NAME **ChangeMe**
 ENV DB_HOST db
 ENV GLUSTER_HOST storage
 
-RUN mkdir -p /var/log/supervisor ${GLUSTER_VOL_PATH}
+RUN mkdir -p /var/log/supervisor ${GLUSTER_VOL_PATH} /usr/src/nginx
 WORKDIR ${GLUSTER_VOL_PATH}
+
+RUN cd /usr/src/nginx && sudo git clone https://github.com/arut/nginx-rtmp-module.git
+RUN cd /nginx-* && perl -p -i -e "s/ngx_http_substitutions_filter_module \\\/ngx_http_substitutions_filter_module \\\\\n            --add-module=\/usr\/src\/nginx\/nginx-rtmp-module \\\/g" debian/rules
+RUN cd /nginx-* && dpkg-buildpackage -b
+RUN dpkg --install /nginx-common_* /nginx-full_*
 
 RUN mkdir -p /usr/local/bin
 ADD ./bin /usr/local/bin
