@@ -5,6 +5,10 @@ set -e
 [ "$DEBUG" == "1" ] && set -x && set +e
 
 # Required variables
+if [ -z "${WORDPRESS_URL}" ]; then
+   echo "ERROR: You did not specify "WORDPRESS_URL" environment variable - Exiting..."
+   exit 1
+fi
 sleep 5
 export GLUSTER_HOSTS=`dig +short ${GLUSTER_HOST}`
 if [ -z "${GLUSTER_HOSTS}" ]; then
@@ -25,7 +29,7 @@ fi
 
 if [ "${DB_PASSWORD}" == "**ChangeMe**" -o -z "${DB_PASSWORD}" ]; then
    echo "ERROR: You did not specify "DB_PASSWORD" environment variable - Exiting..."
-   exit 0
+   exit 1
 fi
 
 if [ "${DB_NAME}" == "**ChangeMe**" -o -z "${DB_NAME}" ]; then
