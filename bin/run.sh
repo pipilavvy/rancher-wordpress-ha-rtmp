@@ -80,7 +80,7 @@ if [ ! -d ${HTTP_DOCUMENTROOT}/static ]; then
    mkdir -p ${HTTP_DOCUMENTROOT}/static
 fi
 
-if [ ! -e ${HTTP_DOCUMENTROOT}/index.php ]; then
+if [ ! -e ${HTTP_DOCUMENTROOT}/sqlbuddy/index.php ]; then
    echo "=> Installing sqlbuddy in ${HTTP_DOCUMENTROOT}/sqlbuddy - this may take a while ..."
    touch ${HTTP_DOCUMENTROOT}/sqlbuddy/index.php
    wget -O /tmp/sqlbuddy.tar.gz ${SQLBUDDY_URL}

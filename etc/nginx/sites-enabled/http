@@ -1,57 +1,55 @@
-http {
-    server {
-        listen HTTP_PORT;
+server {
+    listen HTTP_PORT;
 
-        location /hls {
-            types {
-                application/vnd.apple.mpegurl m3u8;
-                video/mp2t ts;
-            }
-            root HTTP_DOCUMENTROOT/data;
-            add_header Cache-Control no-cache;
-            add_header Access-Control-Allow-Origin *;
+    location /hls {
+        types {
+            application/vnd.apple.mpegurl m3u8;
+            video/mp2t ts;
         }
+        root HTTP_DOCUMENTROOT/data;
+        add_header Cache-Control no-cache;
+        add_header Access-Control-Allow-Origin *;
+    }
 
-        location /stat {
-            rtmp_stat all;
-            rtmp_stat_stylesheet static/stat.xsl;
-        }
+    location /stat {
+        rtmp_stat all;
+        rtmp_stat_stylesheet static/stat.xsl;
+    }
 
-        location /static {
-            alias HTTP_DOCUMENTROOT/static;
-        }
+    location /static {
+        alias HTTP_DOCUMENTROOT/static;
+    }
 
-        location /crossdomain.xml {
-            default_type text/xml;
-            return 200 '<?xml version="1.0"?>
-                <!DOCTYPE cross-domain-policy SYSTEM "http://www.adobe.com/xml/dtds/cross-domain-policy.dtd">
-                <cross-domain-policy>
-                    <site-control permitted-cross-domain-policies="all"/>
-                    <allow-access-from domain="*" secure="false"/>
-                    <allow-http-request-headers-from domain="*" headers="*" secure="false"/>
-                </cross-domain-policy>';
-            expires 24h;
-        }
+    location /crossdomain.xml {
+    default_type text/xml;
+    return 200 '<?xml version="1.0"?>
+            <!DOCTYPE cross-domain-policy SYSTEM "http://www.adobe.com/xml/dtds/cross-domain-policy.dtd">
+            <cross-domain-policy>
+                <site-control permitted-cross-domain-policies="all"/>
+                <allow-access-from domain="*" secure="false"/>
+                <allow-http-request-headers-from domain="*" headers="*" secure="false"/>
+            </cross-domain-policy>';
+        expires 24h;
+    }
         
-        location /sqlbuddy {
-        	root HTTP_DOCUMENTROOT/sqlbuddy;
-	        index index.php index.html index.htm;
+    location /sqlbuddy {
+    	root HTTP_DOCUMENTROOT/sqlbuddy;
+	    index index.php index.html index.htm;
 	
-	        sendfile off;
+	    sendfile off;
 
-	        error_page 500 502 503 504 /50x.html;
-	    }
+	    error_page 500 502 503 504 /50x.html;
+	}
 	        
-	    location = /50x.html {
-	    	root /usr/share/nginx/www;
-	    }
+    location = /50x.html {
+	    root /usr/share/nginx/www;
+    }
 
-	    location ~ \.php$ {
-            try_files $uri =404;
-            fastcgi_split_path_info ^(.+\.php)(/.+)$;
-            fastcgi_pass unix:/var/run/php5-fpm.sock;
-            fastcgi_index index.php;
-            include fastcgi_params;
-	    }
+	location ~ \.php$ {
+        try_files $uri =404;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_pass unix:/var/run/php5-fpm.sock;
+        fastcgi_index index.php;
+        include fastcgi_params;
     }
 }
