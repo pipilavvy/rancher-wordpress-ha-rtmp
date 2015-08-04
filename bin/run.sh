@@ -5,8 +5,8 @@ set -e
 [ "$DEBUG" == "1" ] && set -x && set +e
 
 # Required variables
-if [ -z "${WORDPRESS_URL}" ]; then
-   echo "ERROR: You did not specify "WORDPRESS_URL" environment variable - Exiting..."
+if [ -z "${SQLBUDDY_URL}" ]; then
+   echo "ERROR: You did not specify "SQLBUDDY_URL" environment variable - Exiting..."
    exit 1
 fi
 sleep 5
@@ -32,23 +32,16 @@ if [ "${DB_PASSWORD}" == "**ChangeMe**" -o -z "${DB_PASSWORD}" ]; then
    exit 1
 fi
 
-if [ "${DB_NAME}" == "**ChangeMe**" -o -z "${DB_NAME}" ]; then
-   DB_NAME=`echo "${WORDPRESS_NAME}" | sed "s/\./_/g"`
-fi
-
-if [ "${HTTP_DOCUMENTROOT}" == "**ChangeMe**" -o -z "${HTTP_DOCUMENTROOT}" ]; then
-   HTTP_DOCUMENTROOT=${GLUSTER_VOL_PATH}/${WORDPRESS_NAME}
-fi
-
 ### Prepare configuration
 # nginx config
-perl -p -i -e "s/HTTP_PORT/${HTTP_PORT}/g" /etc/nginx/sites-enabled/wordpress
 HTTP_ESCAPED_DOCROOT=`echo ${HTTP_DOCUMENTROOT} | sed "s/\//\\\\\\\\\//g"`
-perl -p -i -e "s/HTTP_DOCUMENTROOT/${HTTP_ESCAPED_DOCROOT}/g" /etc/nginx/sites-enabled/wordpress
 
-# php-fpm config
-PHP_ESCAPED_SESSION_PATH=`echo ${PHP_SESSION_PATH} | sed "s/\//\\\\\\\\\//g"`
-perl -p -i -e "s/;?session.save_path\s*=.*/session.save_path = \"${PHP_ESCAPED_SESSION_PATH}\"/g" /etc/php5/fpm/php.ini
+perl -p -i -e "s/HTTP_PORT/${HTTP_PORT}/g" /etc/nginx/sites-enabled/sqlbuddy
+perl -p -i -e "s/HTTP_DOCUMENTROOT/${HTTP_ESCAPED_DOCROOT}/g" /etc/nginx/sites-enabled/sqlbuddy
+
+perl -p -i -e "s/RTMP_PORT/${RTMP_PORT}/g" /etc/nginx/sites-enabled/rtmp
+perl -p -i -e "s/HTTP_PORT/${HTTP_PORT}/g" /etc/nginx/sites-enabled/rtmp
+perl -p -i -e "s/HTTP_DOCUMENTROOT/${HTTP_ESCAPED_DOCROOT}/g" /etc/nginx/sites-enabled/rtmp
 
 ALIVE=0
 for glusterHost in ${GLUSTER_HOSTS}; do
@@ -74,17 +67,21 @@ if [ ! -d ${HTTP_DOCUMENTROOT} ]; then
    mkdir -p ${HTTP_DOCUMENTROOT}
 fi
 
-if [ ! -d ${PHP_SESSION_PATH} ]; then
-   mkdir -p ${PHP_SESSION_PATH}
-   chown www-data:www-data ${PHP_SESSION_PATH}
+if [ ! -d ${HTTP_DOCUMENTROOT}/sqlbuddy ]; then
+   mkdir -p ${HTTP_DOCUMENTROOT}/sqlbuddy
+fi
+
+if [ ! -d ${HTTP_DOCUMENTROOT}/data ]; then
+   mkdir -p ${HTTP_DOCUMENTROOT}/data
 fi
 
 if [ ! -e ${HTTP_DOCUMENTROOT}/index.php ]; then
-   echo "=> Installing wordpress in ${HTTP_DOCUMENTROOT} - this may take a while ..."
-   touch ${HTTP_DOCUMENTROOT}/index.php
-   curl -o /tmp/wordpress.tar.gz ${WORDPRESS_URL}
-   tar -zxf /tmp/wordpress.tar.gz -C /tmp/
-   mv /tmp/wordpress/* ${HTTP_DOCUMENTROOT}/
+   echo "=> Installing sqlbuddy in ${HTTP_DOCUMENTROOT}/sqlbuddy - this may take a while ..."
+   touch ${HTTP_DOCUMENTROOT}/sqlbuddy/index.php
+   curl -o /tmp/sqlbuddy.tar.gz ${SQLBUDDY_URL}
+   tar -zxf /tmp/sqlbuddy.tar.gz -C /tmp/
+   mv /tmp/sqlbuddy-*/src/* ${HTTP_DOCUMENTROOT}/sqlbuddy/
+   rm -rf /tmp/sqlbuddy-*
    chown -R www-data:www-data ${HTTP_DOCUMENTROOT}
 fi
 
@@ -102,52 +99,6 @@ if grep "PXC nodes here" /etc/haproxy/haproxy.cfg >/dev/null; then
    perl -p -i -e "s/DB_PASSWORD/${DB_PASSWORD}/g" /etc/haproxy/haproxy.cfg
    perl -p -i -e "s/.*server pxc.*//g" /etc/haproxy/haproxy.cfg
    perl -p -i -e "s/# PXC nodes here.*/# PXC nodes here\n${PXC_HOSTS_HAPROXY}/g" /etc/haproxy/haproxy.cfg
-fi
-
-if [ ! -e ${HTTP_DOCUMENTROOT}/wp-config.php ] && [ -e ${HTTP_DOCUMENTROOT}/wp-config-sample.php ] ; then
-   echo "=> Configuring wordpress..."
-   touch ${HTTP_DOCUMENTROOT}/wp-config.php
-   WP_DB_PASSWORD=`pwgen -s 20 1`
-   sed -e "s/database_name_here/$DB_NAME/
-   s/username_here/$DB_NAME/
-   s/password_here/$WP_DB_PASSWORD/
-   s/localhost/127.0.0.1/
-   /'AUTH_KEY'/s/put your unique phrase here/`pwgen -c -n -1 65`/
-   /'SECURE_AUTH_KEY'/s/put your unique phrase here/`pwgen -c -n -1 65`/
-   /'LOGGED_IN_KEY'/s/put your unique phrase here/`pwgen -c -n -1 65`/
-   /'NONCE_KEY'/s/put your unique phrase here/`pwgen -c -n -1 65`/
-   /'AUTH_SALT'/s/put your unique phrase here/`pwgen -c -n -1 65`/
-   /'SECURE_AUTH_SALT'/s/put your unique phrase here/`pwgen -c -n -1 65`/
-   /'LOGGED_IN_SALT'/s/put your unique phrase here/`pwgen -c -n -1 65`/
-   /'NONCE_SALT'/s/put your unique phrase here/`pwgen -c -n -1 65`/" ${HTTP_DOCUMENTROOT}/wp-config-sample.php > ${HTTP_DOCUMENTROOT}/wp-config.php
-   chown www-data:www-data ${HTTP_DOCUMENTROOT}/wp-config.php
-   chmod 640 ${HTTP_DOCUMENTROOT}/wp-config.php
-
-  # Download nginx helper plugin
-  curl -O `curl -i -s https://wordpress.org/plugins/nginx-helper/ | egrep -o "https://downloads.wordpress.org/plugin/[^']+"`
-  unzip -o nginx-helper.*.zip -d ${HTTP_DOCUMENTROOT}/wp-content/plugins
-  chown -R www-data:www-data ${HTTP_DOCUMENTROOT}/wp-content/plugins/nginx-helper
-
-  # Activate nginx plugin and set up pretty permalink structure once logged in
-  cat << ENDL >> ${HTTP_DOCUMENTROOT}/wp-config.php
-\$plugins = get_option( 'active_plugins' );
-if ( count( \$plugins ) === 0 ) {
-  require_once(ABSPATH .'/wp-admin/includes/plugin.php');
-  \$wp_rewrite->set_permalink_structure( '/%postname%/' );
-  \$pluginsToActivate = array( 'nginx-helper/nginx-helper.php' );
-  foreach ( \$pluginsToActivate as \$plugin ) {
-    if ( !in_array( \$plugin, \$plugins ) ) {
-      activate_plugin( '${HTTP_DOCUMENTROOT}/wp-content/plugins/' . \$plugin );
-    }
-  }
-}
-ENDL
-
-  echo "=> Creating database ${DB_NAME}, username ${DB_NAME}, with password ${WP_DB_PASSWORD} ..."
-  service haproxy start
-  sleep 2
-  mysql -h 127.0.0.1 -u root -p${DB_PASSWORD} -e "CREATE DATABASE IF NOT EXISTS ${DB_NAME}; GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_NAME}'@'10.42.%' IDENTIFIED BY '${WP_DB_PASSWORD}'; FLUSH PRIVILEGES;"
-  service haproxy stop
 fi
 
 if [ ! -e ${HTTP_DOCUMENTROOT}/healthcheck.txt ]; then

@@ -1,7 +1,7 @@
 server {
 	listen HTTP_PORT;
 
-	root HTTP_DOCUMENTROOT;
+	root HTTP_DOCUMENTROOT/sqlbuddy;
 	index index.php index.html index.htm;
 
 	server_name localhost;

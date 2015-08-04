@@ -15,18 +15,16 @@ RUN add-apt-repository -y ppa:mc3man/trusty-media && \
     apt-get source nginx && \
     apt-get -y build-dep nginx
 
-ENV WORDPRESS_URL https://wordpress.org/wordpress-4.2.2.tar.gz
-ENV WORDPRESS_NAME wordpress
+ENV SQLBUDDY_URL https://github.com/lavvy/sqlbuddy/archive/v1.0.0.tar.gz
 ENV GLUSTER_VOL ranchervol
 ENV GLUSTER_VOL_PATH /var/www
 ENV HTTP_PORT 80
-ENV HTTP_DOCUMENTROOT **ChangeMe**
-ENV PHP_SESSION_PATH ${GLUSTER_VOL_PATH}/phpsessions
+ENV RTMP_PORT 1935
+ENV HTTP_DOCUMENTROOT ${GLUSTER_VOL_PATH}
 ENV DEBUG 0
 
 ENV DB_USER root
 ENV DB_PASSWORD **ChangeMe**
-ENV DB_NAME **ChangeMe**
 ENV DB_HOST db
 ENV GLUSTER_HOST storage
 
@@ -44,7 +42,7 @@ ADD ./bin /usr/local/bin
 RUN chmod +x /usr/local/bin/*.sh
 ADD ./etc/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 ADD ./etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg
-ADD ./etc/nginx/sites-enabled/wordpress /etc/nginx/sites-enabled/wordpress
+ADD ./etc/nginx/sites-enabled/sqlbuddy /etc/nginx/sites-enabled/sqlbuddy
 
 # nginx config
 RUN sed -i -e"s/keepalive_timeout\s*65/keepalive_timeout 2/" /etc/nginx/nginx.conf
