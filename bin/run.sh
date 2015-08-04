@@ -76,12 +76,16 @@ if [ ! -d ${HTTP_DOCUMENTROOT}/data ]; then
    mkdir -p ${HTTP_DOCUMENTROOT}/data
 fi
 
+if [ ! -d ${HTTP_DOCUMENTROOT}/static ]; then
+   mkdir -p ${HTTP_DOCUMENTROOT}/static
+fi
+
 if [ ! -e ${HTTP_DOCUMENTROOT}/index.php ]; then
    echo "=> Installing sqlbuddy in ${HTTP_DOCUMENTROOT}/sqlbuddy - this may take a while ..."
    touch ${HTTP_DOCUMENTROOT}/sqlbuddy/index.php
    wget -O /tmp/sqlbuddy.tar.gz ${SQLBUDDY_URL}
    tar -zxf /tmp/sqlbuddy.tar.gz -C /tmp/
-   mv /tmp/sqlbuddy-*/src/* ${HTTP_DOCUMENTROOT}/sqlbuddy/
+   cp -pr /tmp/sqlbuddy-*/src/* ${HTTP_DOCUMENTROOT}/sqlbuddy/
    rm -rf /tmp/sqlbuddy-*
    chown -R www-data:www-data ${HTTP_DOCUMENTROOT}
 fi
@@ -106,6 +110,9 @@ if [ ! -e ${HTTP_DOCUMENTROOT}/healthcheck.txt ]; then
    echo "OK" > ${HTTP_DOCUMENTROOT}/healthcheck.txt
 fi
 
-if 
+if [ ! -e ${HTTP_DOCUMENTROOT}/static/stat.xsl ]; then
+   cp -p /static/stat.xsl ${HTTP_DOCUMENTROOT}/static/stat.xsl
+   chown -R www-data:www-data ${HTTP_DOCUMENTROOT}/static
+fi
 
 /usr/bin/supervisord
