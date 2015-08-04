@@ -27,10 +27,11 @@ if [ -z "${DB_HOSTS}" ]; then
    exit 1
 fi
 
-if [ "${DB_PASSWORD}" == "**ChangeMe**" -o -z "${DB_PASSWORD}" ]; then
-   echo "ERROR: You did not specify "DB_PASSWORD" environment variable - Exiting..."
-   exit 1
-fi
+# Seems not to be necessary
+#if [ "${DB_PASSWORD}" == "**ChangeMe**" -o -z "${DB_PASSWORD}" ]; then
+#   echo "ERROR: You did not specify "DB_PASSWORD" environment variable - Exiting..."
+#   exit 1
+#fi
 
 ### Prepare configuration
 # nginx config
@@ -104,5 +105,7 @@ fi
 if [ ! -e ${HTTP_DOCUMENTROOT}/healthcheck.txt ]; then
    echo "OK" > ${HTTP_DOCUMENTROOT}/healthcheck.txt
 fi
+
+if 
 
 /usr/bin/supervisord
