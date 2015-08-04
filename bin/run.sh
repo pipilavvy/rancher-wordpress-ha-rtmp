@@ -36,9 +36,9 @@ fi
 ### Prepare configuration
 # nginx config
 HTTP_ESCAPED_DOCROOT=`echo ${HTTP_DOCUMENTROOT} | sed "s/\//\\\\\\\\\//g"`
-
-perl -p -i -e "s/HTTP_PORT/${HTTP_PORT}/g" /etc/nginx/sites-enabled/sqlbuddy
-perl -p -i -e "s/HTTP_DOCUMENTROOT/${HTTP_ESCAPED_DOCROOT}/g" /etc/nginx/sites-enabled/sqlbuddy
+# Seems not to be necessary
+#perl -p -i -e "s/HTTP_PORT/${HTTP_PORT}/g" /etc/nginx/sites-enabled/sqlbuddy
+#perl -p -i -e "s/HTTP_DOCUMENTROOT/${HTTP_ESCAPED_DOCROOT}/g" /etc/nginx/sites-enabled/sqlbuddy
 
 perl -p -i -e "s/RTMP_PORT/${RTMP_PORT}/g" /etc/nginx/sites-enabled/rtmp
 perl -p -i -e "s/HTTP_PORT/${HTTP_PORT}/g" /etc/nginx/sites-enabled/rtmp
@@ -79,7 +79,7 @@ fi
 if [ ! -e ${HTTP_DOCUMENTROOT}/index.php ]; then
    echo "=> Installing sqlbuddy in ${HTTP_DOCUMENTROOT}/sqlbuddy - this may take a while ..."
    touch ${HTTP_DOCUMENTROOT}/sqlbuddy/index.php
-   curl -o /tmp/sqlbuddy.tar.gz ${SQLBUDDY_URL}
+   wget -O /tmp/sqlbuddy.tar.gz ${SQLBUDDY_URL}
    tar -zxf /tmp/sqlbuddy.tar.gz -C /tmp/
    mv /tmp/sqlbuddy-*/src/* ${HTTP_DOCUMENTROOT}/sqlbuddy/
    rm -rf /tmp/sqlbuddy-*

@@ -8,14 +8,14 @@ RUN apt-get update && \
     apt-get install -y python-software-properties software-properties-common
 RUN add-apt-repository -y ppa:gluster/glusterfs-3.5 && \
     apt-get update && \
-    apt-get install -y php5-fpm php5-mysql php-apc supervisor glusterfs-client curl haproxy pwgen unzip mysql-client dnsutils
+    apt-get install -y php5-fpm php5-mysql php-apc supervisor glusterfs-client wget haproxy pwgen unzip mysql-client dnsutils
 RUN add-apt-repository -y ppa:mc3man/trusty-media && \
     apt-get update && \
     apt-get install -y ffmpeg dpkg-dev git && \
     apt-get source nginx && \
     apt-get -y build-dep nginx
 
-ENV SQLBUDDY_URL https://github.com/lavvy/sqlbuddy/archive/v1.0.0.tar.gz
+ENV SQLBUDDY_URL https://codeload.github.com/lavvy/sqlbuddy/tar.gz/v1.0.0
 ENV GLUSTER_VOL ranchervol
 ENV GLUSTER_VOL_PATH /var/www
 ENV HTTP_PORT 80
