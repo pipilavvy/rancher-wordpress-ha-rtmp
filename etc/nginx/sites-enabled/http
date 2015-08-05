@@ -34,22 +34,28 @@ server {
         
     location /sqlbuddy {
     	root HTTP_DOCUMENTROOT/sqlbuddy;
-	    index index.php index.html index.htm;
+	index index.php index.html index.htm;
 	
-	    sendfile off;
+	sendfile off;
 
-	    error_page 500 502 503 504 /50x.html;
-	}
+	error_page 500 502 503 504 /50x.html;
+
+        location ~ \.php$ {
+            try_files $uri =404;
+            fastcgi_split_path_info ^(.+\.php)(/.+)$;
+            fastcgi_pass unix:/var/run/php5-fpm.sock;
+            fastcgi_index index.php;
+            fastcgi_param SCRIPT_FILENAME HTTP_DOCUMENTROOT$fastcgi_script_name;
+            include fastcgi_params;
+        }
+
+    }
+
+    location /healthcheck.txt {
+        alias HTTP_DOCUMENTROOT/healthcheck.txt;
+    }
 	        
     location = /50x.html {
 	    root /usr/share/nginx/www;
-    }
-
-	location ~ \.php$ {
-        try_files $uri =404;
-        fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        fastcgi_pass unix:/var/run/php5-fpm.sock;
-        fastcgi_index index.php;
-        include fastcgi_params;
     }
 }
