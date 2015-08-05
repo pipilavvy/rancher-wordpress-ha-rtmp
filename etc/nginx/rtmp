@@ -1,5 +1,5 @@
 server {
-    listen RTPM_PORT;
+    listen RTMP_PORT;
     chunk_size 4000;
 
     application encoder {
