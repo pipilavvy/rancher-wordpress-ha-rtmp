@@ -1,5 +1,6 @@
 server {
     listen HTTP_PORT;
+    root HTTP_DOCUMENTROOT;
 
     location /hls {
         types {
@@ -33,7 +34,6 @@ server {
     }
         
     location /sqlbuddy {
-    	root HTTP_DOCUMENTROOT/sqlbuddy;
 	index index.php index.html index.htm;
 	
 	sendfile off;
@@ -45,7 +45,6 @@ server {
             fastcgi_split_path_info ^(.+\.php)(/.+)$;
             fastcgi_pass unix:/var/run/php5-fpm.sock;
             fastcgi_index index.php;
-            fastcgi_param SCRIPT_FILENAME HTTP_DOCUMENTROOT$fastcgi_script_name;
             include fastcgi_params;
         }
 
