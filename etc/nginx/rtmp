@@ -7,12 +7,12 @@ server {
 
         wait_video on;
 
-        exec ffmpeg -i rtmp://${sitename}/encoder/$name
-              -c:a libfdk_aac -b:a 128k -c:v libx264 -b:v 2500k -f flv -g 30 -r 30 -s 1280x720 -preset superfast -profile:v baseline rtmp://${sitename}/hls/$name_720p2628kbs
-              -c:a libfdk_aac -b:a 128k -c:v libx264 -b:v 1000k -f flv -g 30 -r 30 -s 854x480 -preset superfast -profile:v baseline rtmp://${sitename}/hls/$name_480p1128kbs
-              -c:a libfdk_aac -b:a 128k -c:v libx264 -b:v 750k -f flv -g 30 -r 30 -s 640x360 -preset superfast -profile:v baseline rtmp://${sitename}/hls/$name_360p878kbs
-              -c:a libfdk_aac -b:a 128k -c:v libx264 -b:v 400k -f flv -g 30 -r 30 -s 426x240 -preset superfast -profile:v baseline rtmp://${sitename}/hls/$name_240p528kbs
-              -c:a libfdk_aac -b:a 64k -c:v libx264 -b:v 200k -f flv -g 15 -r 15 -s 426x240 -preset superfast -profile:v baseline rtmp://${sitename}/hls/$name_240p264kbs;
+        exec ffmpeg -i rtmp://localhost:RTMP_PORT/encoder/$name
+              -c:a libfdk_aac -b:a 128k -c:v libx264 -b:v 2500k -f flv -g 30 -r 30 -s 1280x720 -preset superfast -profile:v baseline rtmp://localhost:RTMP_PORT/hls/$name_720p2628kbs
+              -c:a libfdk_aac -b:a 128k -c:v libx264 -b:v 1000k -f flv -g 30 -r 30 -s 854x480 -preset superfast -profile:v baseline rtmp://localhost:RTMP_PORT/hls/$name_480p1128kbs
+              -c:a libfdk_aac -b:a 128k -c:v libx264 -b:v 750k -f flv -g 30 -r 30 -s 640x360 -preset superfast -profile:v baseline rtmp://localhost:RTMP_PORT/hls/$name_360p878kbs
+              -c:a libfdk_aac -b:a 128k -c:v libx264 -b:v 400k -f flv -g 30 -r 30 -s 426x240 -preset superfast -profile:v baseline rtmp://localhost:RTMP_PORT/hls/$name_240p528kbs
+              -c:a libfdk_aac -b:a 64k -c:v libx264 -b:v 200k -f flv -g 15 -r 15 -s 426x240 -preset superfast -profile:v baseline rtmp://localhost:RTMP_PORT/hls/$name_240p264kbs;
     }
 
     application hls {
@@ -20,7 +20,7 @@ server {
         hls on;
         hls_fragment_naming system;
         hls_fragment 5s;
-        hls_path /tmp/hls;
+        hls_path HTTP_DOCUMENTROOT/hls;
         hls_nested on;
 
         hls_variant _720p2628kbs BANDWIDTH=2628000,RESOLUTION=1280x720;

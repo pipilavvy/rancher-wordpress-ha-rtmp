@@ -76,6 +76,10 @@ if [ ! -d ${HTTP_DOCUMENTROOT}/data ]; then
    mkdir -p ${HTTP_DOCUMENTROOT}/data
 fi
 
+if [ ! -d ${HTTP_DOCUMENTROOT}/hls ]; then
+   mkdir -p ${HTTP_DOCUMENTROOT}hls/
+fi
+
 if [ ! -d ${HTTP_DOCUMENTROOT}/static ]; then
    mkdir -p ${HTTP_DOCUMENTROOT}/static
 fi
