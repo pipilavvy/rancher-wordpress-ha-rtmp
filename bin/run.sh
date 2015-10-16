@@ -10,14 +10,14 @@ if [ -z "${SQLBUDDY_URL}" ]; then
    exit 1
 fi
 sleep 5
-export GLUSTER_HOSTS=`dig +short ${GLUSTER_HOST}`
-if [ -z "${GLUSTER_HOSTS}" ]; then
-   echo "*** ERROR: Could not determine which containers are part of Gluster service."
-   echo "*** Is Gluster service linked with the alias \"${GLUSTER_HOST}\"?"
-   echo "*** If not, please link gluster service as \"${GLUSTER_HOST}\""
-   echo "*** Exiting ..."
-   exit 1
-fi
+#export GLUSTER_HOSTS=`dig +short ${GLUSTER_HOST}`
+#if [ -z "${GLUSTER_HOSTS}" ]; then
+ #  echo "*** ERROR: Could not determine which containers are part of Gluster service."
+ #  echo "*** Is Gluster service linked with the alias \"${GLUSTER_HOST}\"?"
+ #  echo "*** If not, please link gluster service as \"${GLUSTER_HOST}\""
+ #  echo "*** Exiting ..."
+ #  exit 1
+#fi
 export DB_HOSTS=`dig +short ${DB_HOST}`
 if [ -z "${DB_HOSTS}" ]; then
    echo "*** ERROR: Could not determine which containers are part of PXC service."
@@ -45,25 +45,25 @@ perl -p -i -e "s/HTTP_DOCUMENTROOT/${HTTP_ESCAPED_DOCROOT}/g" /etc/nginx/rtmp
 perl -p -i -e "s/HTTP_PORT/${HTTP_PORT}/g" /etc/nginx/sites-enabled/http
 perl -p -i -e "s/HTTP_DOCUMENTROOT/${HTTP_ESCAPED_DOCROOT}/g" /etc/nginx/sites-enabled/http
 
-ALIVE=0
-for glusterHost in ${GLUSTER_HOSTS}; do
-    echo "=> Checking if I can reach GlusterFS node ${glusterHost} ..."
-    if ping -c 10 ${glusterHost} >/dev/null 2>&1; then
-       echo "=> GlusterFS node ${glusterHost} is alive"
-       ALIVE=1
-       break
-    else
-       echo "*** Could not reach server ${glusterHost} ..."
-    fi
-done
+#ALIVE=0
+#for glusterHost in ${GLUSTER_HOSTS}; do
+#    echo "=> Checking if I can reach GlusterFS node ${glusterHost} ..."
+#    if ping -c 10 ${glusterHost} >/dev/null 2>&1; then
+#       echo "=> GlusterFS node ${glusterHost} is alive"
+#       ALIVE=1
+#       break
+#    else
+#       echo "*** Could not reach server ${glusterHost} ..."
+#    fi
+#done
 
-if [ "$ALIVE" == 0 ]; then
-   echo "ERROR: could not contact any GlusterFS node from this list: ${GLUSTER_HOSTS} - Exiting..."
-   exit 1
-fi
+#if [ "$ALIVE" == 0 ]; then
+#   echo "ERROR: could not contact any GlusterFS node from this list: ${GLUSTER_HOSTS} - Exiting..."
+#   exit 1
+#fi
 
-echo "=> Mounting GlusterFS volume ${GLUSTER_VOL} from GlusterFS node ${glusterHost} ..."
-mount -t glusterfs ${glusterHost}:/${GLUSTER_VOL} ${GLUSTER_VOL_PATH}
+#echo "=> Mounting GlusterFS volume ${GLUSTER_VOL} from GlusterFS node ${glusterHost} ..."
+#mount -t glusterfs ${glusterHost}:/${GLUSTER_VOL} ${GLUSTER_VOL_PATH}
 
 if [ ! -d ${HTTP_DOCUMENTROOT} ]; then
    mkdir -p ${HTTP_DOCUMENTROOT}
