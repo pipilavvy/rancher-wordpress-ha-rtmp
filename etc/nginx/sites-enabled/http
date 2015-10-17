@@ -33,7 +33,7 @@ server {
         expires 24h;
     }
         
-    location /sqlbuddy {
+    location / {
 	index index.php index.html index.htm;
 	
 	sendfile off;
