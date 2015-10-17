@@ -69,9 +69,9 @@ if [ ! -d ${HTTP_DOCUMENTROOT} ]; then
    mkdir -p ${HTTP_DOCUMENTROOT}
 fi
 
-if [ ! -d ${HTTP_DOCUMENTROOT}/sqlbuddy ]; then
-   mkdir -p ${HTTP_DOCUMENTROOT}/sqlbuddy
-fi
+#if [ ! -d ${HTTP_DOCUMENTROOT}/sqlbuddy ]; then
+#   mkdir -p ${HTTP_DOCUMENTROOT}/sqlbuddy
+#fi
 
 if [ ! -d ${HTTP_DOCUMENTROOT}/data ]; then
    mkdir -p ${HTTP_DOCUMENTROOT}/data
@@ -81,12 +81,23 @@ if [ ! -d ${HTTP_DOCUMENTROOT}/static ]; then
    mkdir -p ${HTTP_DOCUMENTROOT}/static
 fi
 
-if [ ! -e ${HTTP_DOCUMENTROOT}/sqlbuddy/index.php ]; then
-   echo "=> Installing sqlbuddy in ${HTTP_DOCUMENTROOT}/sqlbuddy - this may take a while ..."
-   touch ${HTTP_DOCUMENTROOT}/sqlbuddy/index.php
+
+#if [ ! -e ${HTTP_DOCUMENTROOT}/sqlbuddy/index.php ]; then
+#   echo "=> Installing sqlbuddy in ${HTTP_DOCUMENTROOT}/sqlbuddy - this may take a while ..."
+#   touch ${HTTP_DOCUMENTROOT}/sqlbuddy/index.php
+#   wget -O /tmp/sqlbuddy.tar.gz ${SQLBUDDY_URL}
+#   tar -zxf /tmp/sqlbuddy.tar.gz -C /tmp/
+#   cp -pr /tmp/sqlbuddy-*/src/* ${HTTP_DOCUMENTROOT}/sqlbuddy/
+#   rm -rf /tmp/sqlbuddy-*
+#   chown -R www-data:www-data ${HTTP_DOCUMENTROOT}
+#fi
+
+if [ ! -e ${HTTP_DOCUMENTROOT}/index.php ]; then
+   echo "=> Installing sqlbuddy in ${HTTP_DOCUMENTROOT}/ - this may take a while ..."
+   touch ${HTTP_DOCUMENTROOT}/index.php
    wget -O /tmp/sqlbuddy.tar.gz ${SQLBUDDY_URL}
    tar -zxf /tmp/sqlbuddy.tar.gz -C /tmp/
-   cp -pr /tmp/sqlbuddy-*/src/* ${HTTP_DOCUMENTROOT}/sqlbuddy/
+   cp -pr /tmp/sqlbuddy-*/src/* ${HTTP_DOCUMENTROOT}/
    rm -rf /tmp/sqlbuddy-*
    chown -R www-data:www-data ${HTTP_DOCUMENTROOT}
 fi
