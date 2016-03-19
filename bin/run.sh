@@ -97,8 +97,8 @@ if [ ! -e ${HTTP_DOCUMENTROOT}/index.php ]; then
    touch ${HTTP_DOCUMENTROOT}/index.php
    wget -O /tmp/sqlbuddy.tar.gz ${SQLBUDDY_URL}
    tar -zxf /tmp/sqlbuddy.tar.gz -C /tmp/
-   cp -pr /tmp/sqlbuddy-*/src/* ${HTTP_DOCUMENTROOT}/
-   rm -rf /tmp/sqlbuddy-*
+   cp -a /tmp/src/. ${HTTP_DOCUMENTROOT}/
+   #rm -rf /tmp/sqlbuddy-*
    chown -R www-data:www-data ${HTTP_DOCUMENTROOT}
 fi
 
