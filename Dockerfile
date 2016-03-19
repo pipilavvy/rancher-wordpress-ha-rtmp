@@ -8,7 +8,7 @@ RUN apt-get update && \
     apt-get install -y python-software-properties software-properties-common
 RUN add-apt-repository -y ppa:gluster/glusterfs-3.5 && \
     apt-get update && \
-    apt-get install -y php5-fpm php5-mysql php-apc supervisor glusterfs-client wget haproxy pwgen unzip mysql-client dnsutils
+    apt-get install -y php5-fpm php5-mysql php-apc supervisor glusterfs-client wget haproxy pwgen unzip php5-gd php5-mcrypt mysql-client dnsutils
 RUN add-apt-repository -y ppa:mc3man/trusty-media && \
     apt-get update && \
     apt-get install -y ffmpeg dpkg-dev git && \
@@ -61,5 +61,5 @@ RUN sed -i -e "s/;daemonize\s*=\s*yes/daemonize = no/g" /etc/php5/fpm/php-fpm.co
 
 # HAProxy
 RUN perl -p -i -e "s/ENABLED=0/ENABLED=1/g" /etc/default/haproxy
-
+EXPOSE 80 1935
 CMD ["/usr/local/bin/run.sh"]
