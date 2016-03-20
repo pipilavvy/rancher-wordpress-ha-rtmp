@@ -18,14 +18,16 @@ sleep 5
  #  echo "*** Exiting ..."
  #  exit 1
 #fi
-export DB_HOSTS=`dig +short ${DB_HOST}`
-if [ -z "${DB_HOSTS}" ]; then
-   echo "*** ERROR: Could not determine which containers are part of PXC service."
-   echo "*** Is PXC service linked with the alias \"${DB_HOST}\"?"
-   echo "*** If not, please link gluster service as \"${DB_HOST}\""
-   echo "*** Exiting ..."
-   exit 1
-fi
+
+
+#export DB_HOSTS=`dig +short ${DB_HOST}`
+#if [ -z "${DB_HOSTS}" ]; then
+ #  echo "*** ERROR: Could not determine which containers are part of PXC service."
+ #  echo "*** Is PXC service linked with the alias \"${DB_HOST}\"?"
+ #  echo "*** If not, please link gluster service as \"${DB_HOST}\""
+ #  echo "*** Exiting ..."
+ #  exit 1
+#fi
 
 # Seems not to be necessary
 #if [ "${DB_PASSWORD}" == "**ChangeMe**" -o -z "${DB_PASSWORD}" ]; then
@@ -102,21 +104,21 @@ if [ ! -e ${HTTP_DOCUMENTROOT}/index.php ]; then
    chown -R www-data:www-data ${HTTP_DOCUMENTROOT}
 fi
 
-if grep "PXC nodes here" /etc/haproxy/haproxy.cfg >/dev/null; then
-   PXC_HOSTS_HAPROXY=""
-   PXC_HOSTS_COUNTER=0
+#if grep "PXC nodes here" /etc/haproxy/haproxy.cfg >/dev/null; then
+#   PXC_HOSTS_HAPROXY=""
+#   PXC_HOSTS_COUNTER=0
 
-   for host in `echo ${DB_HOSTS} | sed "s/,/ /g"`; do
-      PXC_HOSTS_HAPROXY="$PXC_HOSTS_HAPROXY\n  server pxc$PXC_HOSTS_COUNTER $host check port 9200 rise 2 fall 3"
-      if [ $PXC_HOSTS_COUNTER -gt 0 ]; then
-         PXC_HOSTS_HAPROXY="$PXC_HOSTS_HAPROXY backup"
-      fi
-      PXC_HOSTS_COUNTER=$((PXC_HOSTS_COUNTER+1))
-   done
-   perl -p -i -e "s/DB_PASSWORD/${DB_PASSWORD}/g" /etc/haproxy/haproxy.cfg
-   perl -p -i -e "s/.*server pxc.*//g" /etc/haproxy/haproxy.cfg
-   perl -p -i -e "s/# PXC nodes here.*/# PXC nodes here\n${PXC_HOSTS_HAPROXY}/g" /etc/haproxy/haproxy.cfg
-fi
+#   for host in `echo ${DB_HOSTS} | sed "s/,/ /g"`; do
+#      PXC_HOSTS_HAPROXY="$PXC_HOSTS_HAPROXY\n  server pxc$PXC_HOSTS_COUNTER $host check port 9200 rise 2 fall 3"
+#      if [ $PXC_HOSTS_COUNTER -gt 0 ]; then
+#         PXC_HOSTS_HAPROXY="$PXC_HOSTS_HAPROXY backup"
+#      fi
+#      PXC_HOSTS_COUNTER=$((PXC_HOSTS_COUNTER+1))
+#   done
+#   perl -p -i -e "s/DB_PASSWORD/${DB_PASSWORD}/g" /etc/haproxy/haproxy.cfg
+#   perl -p -i -e "s/.*server pxc.*//g" /etc/haproxy/haproxy.cfg
+#   perl -p -i -e "s/# PXC nodes here.*/# PXC nodes here\n${PXC_HOSTS_HAPROXY}/g" /etc/haproxy/haproxy.cfg
+#fi
 
 if [ ! -e ${HTTP_DOCUMENTROOT}/healthcheck.txt ]; then
    echo "OK" > ${HTTP_DOCUMENTROOT}/healthcheck.txt
